@@ -57,17 +57,20 @@ Never commit on `main`. Every branch below is a separate PR, merged before the n
 
 ```bash
 git checkout main && git pull
-git checkout -b feat/p1-enemy-path        # prefix: feat/ fix/ chore/ docs/  then phase + name
+git checkout -b enemy_path                # branch = the feature name in snake_case (see Rules)
 # ... build the feature, test it in Play mode, Console shows 0 errors ...
 git add -A                                # picks up the .meta files Unity generated
 git commit -m "feat(p1): enemies walk the waypoint path"
-git push -u origin feat/p1-enemy-path
+git push -u origin enemy_path
 gh pr create --fill
 gh pr merge --merge --delete-branch
 git checkout main && git pull
 ```
 
 Rules:
+- Branch names say what the feature is, in snake_case: `enemy_path`, `boss_parts`,
+  `skill_card_roll`. Never numbers ("branch 1"): the name is how you remember what you did.
+  Commit messages keep the phase tag: `feat(p1): ...`, `chore(p3): ...`, `docs: ...`.
 - Every asset has a `.meta` file beside it. Commit them together. Never hand-write `.meta` files;
   Unity creates them when the editor regains focus.
 - Commits are authored by the owner only. No Co-Authored-By trailers.
@@ -151,12 +154,12 @@ the output without touching code; the PR contains the `.meta` files.
 
 ### Phase 1 — Enemies walk to the estate
 
-1. `feat/p1-path`: `Path.cs` holds an ordered list of waypoint child `Transform`s and draws the
+1. `enemy_path`: `EnemyPath.cs` holds an ordered list of waypoint child `Transform`s and draws the
    route with `OnDrawGizmos` so you can see it in the Scene view.
-2. `feat/p1-enemy-move`: `EnemyMovement.cs` moves waypoint to waypoint with `Vector2.MoveTowards`;
+2. `enemy_movement`: `EnemyMovement.cs` moves waypoint to waypoint with `Vector2.MoveTowards`;
    an `Enemy` prefab with a placeholder circle sprite; a temporary `EnemySpawner.cs` that
    `Instantiate`s one enemy every 2 seconds.
-3. `feat/p1-estate-health`: `Estate.cs` with `maxHp`; an enemy reaching the last waypoint calls
+3. `estate_health`: `Estate.cs` with `maxHp`; an enemy reaching the last waypoint calls
    `estate.TakeDamage(1)` and destroys itself; at 0 HP log "Game over".
 
 Learn: `Transform`, `Vector2`, `Time.deltaTime`, prefabs, `Instantiate` / `Destroy`, `List<T>`,
@@ -166,16 +169,16 @@ Done when: enemies spawn, follow the drawn path, reduce estate HP, and "Game ove
 
 ### Phase 2 — Heroes fight back
 
-1. `feat/p2-health`: `Health.cs` (enemies now, boss parts later) with `TakeDamage` and an
+1. `enemy_health`: `Health.cs` (enemies now, boss parts later) with `TakeDamage` and an
    `OnDied` event; `IDamageable` interface. `Enemy.Active` static list so heroes can find targets
    without physics.
-2. `feat/p2-hero-attack`: `HeroAttack.cs` finds the nearest enemy within `range` every
+2. `hero_attack`: `HeroAttack.cs` finds the nearest enemy within `range` every
    `attackInterval` seconds and spawns `Projectile.cs`, which flies to its target and calls
    `TakeDamage`. Hero prefab with a placeholder square.
-3. `feat/p2-placement`: `PlacementSlot.cs` colliders beside the path; `SquadPlacer.cs` reads
+3. `hero_placement`: `PlacementSlot.cs` colliders beside the path; `SquadPlacer.cs` reads
    clicks/taps via the Input System (`Pointer.current` + `Physics2D.OverlapPoint`) and places the
    next hero of a 4-hero squad on the clicked slot.
-4. `feat/p2-coins`: `Wallet.cs`; an enemy death adds its `coinReward`; temporary on-screen text.
+4. `coins_wallet`: `Wallet.cs`; an enemy death adds its `coinReward`; temporary on-screen text.
 
 Learn: interfaces, C# events (`event Action`), static members, 2D colliders and layers, physics
 queries, Input System basics.
@@ -184,13 +187,13 @@ Done when: you place 4 heroes, they shoot, enemies die, coins go up. Bad placeme
 
 ### Phase 3 — Waves, HUD, win and lose
 
-1. `feat/p3-data-assets`: `EnemyData` and `WaveData` ScriptableObjects (`[CreateAssetMenu]`);
+1. `enemy_wave_data`: `EnemyData` and `WaveData` ScriptableObjects (`[CreateAssetMenu]`);
    2–3 enemy types (fast and weak, slow and tanky).
-2. `feat/p3-wave-manager`: `WaveManager.cs` runs waves from `WaveData` with a countdown and a
+2. `wave_manager`: `WaveManager.cs` runs waves from `WaveData` with a countdown and a
    "Send next wave" button; `GameManager.cs` state machine Preparing → Playing → Won / Lost.
-3. `feat/p3-hud`: uGUI Canvas showing estate HP, coins, wave X / N; Win and Lose panels with a
+3. `battle_hud`: uGUI Canvas showing estate HP, coins, wave X / N; Win and Lose panels with a
    Restart button (`SceneManager.LoadScene`).
-4. `chore/p3-asmdef-and-tests`: assembly definitions for game code and tests; first EditMode tests
+4. `asmdef_and_tests`: assembly definitions for game code and tests; first EditMode tests
    for pure logic (wave scheduling).
 
 Learn: ScriptableObjects, enums, state machines, coroutines, uGUI + TextMeshPro, scene reload,
@@ -201,11 +204,11 @@ tests are green.
 
 ### Phase 4 — Skill cards (the roguelite "spin")
 
-1. `feat/p4-stats`: `Stat.cs` = base value + list of modifiers (flat or percent). Heroes read
+1. `hero_stats`: `Stat.cs` = base value + list of modifiers (flat or percent). Heroes read
    damage, attack speed, and range through it.
-2. `feat/p4-card-data`: `SkillCardData` ScriptableObject: name, rarity (Common / Rare / Epic),
+2. `skill_card_data`: `SkillCardData` ScriptableObject: name, rarity (Common / Rare / Epic),
    target (one hero or squad), effect (enum + value), icon.
-3. `feat/p4-card-roll`: `CardRoller.cs` spends coins, draws 3 cards by rarity weight, you pick 1,
+3. `skill_card_roll`: `CardRoller.cs` spends coins, draws 3 cards by rarity weight, you pick 1,
    it applies; cost rises every roll. Card picker UI panel.
 
 Learn: weighted random, modifiers and composition, `switch` on enums, UI buttons and events.
@@ -214,14 +217,14 @@ Done when: mid-battle you spend coins, pick a card, and the chosen hero visibly 
 
 ### Phase 5 — Hero and enemy variety
 
-1. `feat/p5-hero-data`: `HeroData` ScriptableObject (stats, attack type single / splash / chain,
+1. `hero_data`: `HeroData` ScriptableObject (stats, attack type single / splash / chain,
    sprite). Four launch heroes: Guardian (melee, high HP), Archer (long range), Mage (splash),
    Bard (slows enemies in range).
-2. `feat/p5-status-effects`: Slow, Burn (damage over time), Stun on enemies.
-3. `feat/p5-active-skills`: tap a hero portrait to fire an ultimate with a cooldown.
-4. `feat/p5-enemy-variety`: flying (only ranged heroes hit it), swarm, armored (flat damage
+2. `status_effects`: Slow, Burn (damage over time), Stun on enemies.
+3. `hero_active_skills`: tap a hero portrait to fire an ultimate with a cooldown.
+4. `enemy_variety`: flying (only ranged heroes hit it), swarm, armored (flat damage
    reduction).
-5. `chore/p5-object-pool`: reuse projectiles and enemies instead of `Instantiate` / `Destroy`.
+5. `object_pooling`: reuse projectiles and enemies instead of `Instantiate` / `Destroy`.
 
 Learn: inheritance vs composition, timers, generics, object pooling.
 
@@ -229,22 +232,22 @@ Done when: each hero feels different and each enemy type needs a different count
 
 ### Phase 6 — Boss with part breaking
 
-1. `feat/p6-boss-parts`: `Boss.cs` plus `BossPart.cs` child objects, each with its own `Health`;
+1. `boss_parts`: `Boss.cs` plus `BossPart.cs` child objects, each with its own `Health`;
    breaking a part disables one attack and stuns the boss briefly.
-2. `feat/p6-boss-patterns`: timed patterns (charge that stuns heroes, summon adds) with a warning
+2. `boss_patterns`: timed patterns (charge that stuns heroes, summon adds) with a warning
    sprite telegraph.
-3. `feat/p6-boss-ui`: boss HP bar with part icons.
+3. `boss_ui`: boss HP bar with part icons.
 
 Done when: wave 10 spawns a boss with at least 2 breakable parts and 2 patterns, and breaking
 parts changes the fight.
 
 ### Phase 7 — Art, animation, sound
 
-1. `feat/p7-map`: Tilemap ground and path tiles.
-2. `feat/p7-sprites`: replace placeholders with real sprites (see Art below).
-3. `feat/p7-animation`: Animator with idle / walk / attack / die clips.
-4. `feat/p7-juice`: hit flash, floating damage numbers, particles, screen shake.
-5. `feat/p7-audio`: SFX and music through `AudioSource`, a tiny `AudioManager`.
+1. `tilemap_map`: Tilemap ground and path tiles.
+2. `sprites`: replace placeholders with real sprites (see Art below).
+3. `animations`: Animator with idle / walk / attack / die clips.
+4. `hit_juice`: hit flash, floating damage numbers, particles, screen shake.
+5. `audio`: SFX and music through `AudioSource`, a tiny `AudioManager`.
 
 Learn: Tilemap, Animator and animation clips, ParticleSystem, AudioSource, sprite atlases.
 
@@ -252,10 +255,10 @@ Done when: a 20-second clip of play looks and sounds like a real game.
 
 ### Phase 8 — Meta game: roster, stages, estate
 
-1. `feat/p8-save`: `SaveData` written as JSON (`JsonUtility`) to `Application.persistentDataPath`.
-2. `feat/p8-menus`: Main Menu scene, Stage Select (list of `StageData`), Squad Select (pick 4).
-3. `feat/p8-hero-progression`: gold from wins levels heroes up and unlocks new ones.
-4. `feat/p8-estate`: Estate screen with buildings bought with gold that grant run bonuses
+1. `save_data`: `SaveData` written as JSON (`JsonUtility`) to `Application.persistentDataPath`.
+2. `menus`: Main Menu scene, Stage Select (list of `StageData`), Squad Select (pick 4).
+3. `hero_progression`: gold from wins levels heroes up and unlocks new ones.
+4. `estate_building`: Estate screen with buildings bought with gold that grant run bonuses
    (+estate HP, +starting coins, cheaper card rolls).
 
 Learn: multiple scenes and `SceneManager`, persistence and serialization, `DontDestroyOnLoad`.
@@ -265,8 +268,8 @@ in battle.
 
 ### Phase 9 — Android build and polish
 
-`feat/p9-touch-input`, `feat/p9-safe-area-ui`, `feat/p9-performance` (Profiler, sprite atlas),
-`feat/p9-settings` (volume), `feat/p9-tutorial`, `chore/p9-android-build`.
+`touch_input`, `safe_area_ui`, `performance` (Profiler, sprite atlas), `settings_menu` (volume),
+`tutorial`, `android_build`.
 
 Done when: an Android build (.apk) runs the full loop at 60 fps on a real phone.
 
