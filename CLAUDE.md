@@ -283,7 +283,7 @@ into `Assets`). Never use characters or art from the manhwa or the official game
 ## Status
 
 - [x] Plan written: this file (2026-09-17)
-- [ ] Phase 0 — workspace and first script
+- [x] Phase 0 — workspace and first script (2026-09-17)
 - [ ] Phase 1 — enemies walk to the estate
 - [ ] Phase 2 — heroes fight back
 - [ ] Phase 3 — waves, HUD, win and lose
