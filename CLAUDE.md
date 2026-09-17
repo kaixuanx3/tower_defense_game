@@ -26,6 +26,7 @@ the mechanics, not the content.
 | Thing | Value |
 |---|---|
 | Unity | 6.3 LTS (`6000.3.24f1`), 2D URP template, macOS |
+| Target platform | Android phones only (no iOS), portrait orientation |
 | Packages already installed | Input System, 2D Tilemap (+Extras), 2D Animation, Aseprite importer, Unity UI (uGUI) + TextMeshPro, Test Framework |
 | Language | C#. Unity scripts are classes that inherit `MonoBehaviour` and get attached to objects in a scene |
 | Repo | `github.com/kaixuanx3/tower_defense_game`, default branch `main` |
@@ -134,10 +135,11 @@ the next. **Learn** lists the Unity and C# ideas that phase introduces, in order
 
 Goal: understand the editor, run a script you wrote, make a correct commit.
 
-1. `chore/p0-project-layout`: create `Assets/_Game/...` folders; move `SampleScene` to
-   `_Game/Scenes/Game.unity`; add it to the Scene List (File > Build Profiles); set
-   Edit > Project Settings > Version Control > Mode to **Visible Meta Files** (we use git, not
-   Unity Version Control).
+1. `chore/p0-project-layout`: create `Assets/_Game/Scenes` and move `SampleScene` there as
+   `Game.unity`; confirm it is in the Scene List (File > Build Profiles); switch the active
+   platform to Android and set Default Orientation to Portrait; set Edit > Project Settings >
+   Version Control > Mode to **Visible Meta Files** (we use git, not Unity Version Control).
+   Other `_Game` folders are created when their first file lands.
 2. `feat/p0-hello-world`: `Bootstrap.cs` with a `[SerializeField] string message` and
    `Debug.Log(message)` in `Start()`, attached to an empty `Game` object.
 
@@ -261,12 +263,12 @@ Learn: multiple scenes and `SceneManager`, persistence and serialization, `DontD
 Done when: quit and reopen keeps progress; beating a stage unlocks the next; estate bonuses apply
 in battle.
 
-### Phase 9 — Mobile build and polish
+### Phase 9 — Android build and polish
 
 `feat/p9-touch-input`, `feat/p9-safe-area-ui`, `feat/p9-performance` (Profiler, sprite atlas),
 `feat/p9-settings` (volume), `feat/p9-tutorial`, `chore/p9-android-build`.
 
-Done when: an Android or iOS (or desktop) build runs the full loop at 60 fps.
+Done when: an Android build (.apk) runs the full loop at 60 fps on a real phone.
 
 **Out of scope for now:** real-time PvP, gacha and monetization, live-ops. Revisit after Phase 9.
 
@@ -290,6 +292,6 @@ into `Assets`). Never use characters or art from the manhwa or the official game
 - [ ] Phase 6 — boss with part breaking
 - [ ] Phase 7 — art, animation, sound
 - [ ] Phase 8 — meta game
-- [ ] Phase 9 — mobile build and polish
+- [ ] Phase 9 — Android build and polish
 
 Update this list (with the date) every time a phase's last PR is merged.
